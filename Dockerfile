@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     openjdk-21-jdk \
     ca-certificates \
     sudo \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root dev user
@@ -24,15 +25,23 @@ RUN useradd -m dev && echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER dev
 WORKDIR /workspace
 
-# SDKMAN (user-local, correct)
-RUN curl -s "https://get.sdkman.io" | bash
+# Copy package.json and install Node.js dependencies
+COPY --chown=dev:dev package.json ./
+RUN npm install
 
-# Kotlin + Gradle
-RUN bash -lc "\
-  source /home/dev/.sdkman/bin/sdkman-init.sh && \
-  sdk install kotlin && \
-  sdk install gradle \
-"
+# SDKMAN + Kotlin + Gradle
+ENV sdkman_insecure_ssl=true
+RUN bash <<'EOF'
+set -e
+export SDKMAN_DIR="/home/dev/.sdkman"
+# Temporarily configure curl to skip SSL verification
+echo "insecure" > ~/.curlrc
+curl -fsSL "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install kotlin
+sdk install gradle
+rm ~/.curlrc
+EOF
 
 # Python dev tools via pipx (PEP 668–safe)
 RUN pipx install poetry
