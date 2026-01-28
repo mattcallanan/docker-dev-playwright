@@ -21,8 +21,10 @@ mkdir -p "$HOME/.claude"
 
 # Run the docker command with the token
 # Mount ~/.claude for Claude Code CLI session persistence
+# Mount workspace at same path as host so Claude sessions can resume correctly
 docker run --rm \
-  -v "$PWD:/workspace" \
+  -v "$PWD:$PWD" \
+  -w "$PWD" \
   -v "$HOME/.claude:/home/dev/.claude" \
   --add-host=host.docker.internal:host-gateway \
   -e PLAYWRIGHT_TOKEN="$TOKEN" \

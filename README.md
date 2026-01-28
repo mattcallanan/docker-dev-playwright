@@ -75,7 +75,7 @@ TOKEN=$(./start-playwright-server.sh)
 Then start an interactive shell:
 
 ```bash
-docker run -it --rm -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN="$TOKEN" docker-dev-playwright bash
+docker run -it --rm -v "$PWD:$PWD" -w "$PWD" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN="$TOKEN" docker-dev-playwright bash
 ```
 
 Run your test scripts inside the container:
@@ -83,6 +83,18 @@ Run your test scripts inside the container:
 ```bash
 npx tsx playwright-example.ts
 ```
+
+## Claude Code CLI
+
+The Docker image includes Claude Code CLI. To run an interactive Claude session:
+
+```bash
+docker run --rm -it -v "$PWD:$PWD" -w "$PWD" -v "$HOME/.claude:/home/dev/.claude" docker-dev-playwright claude --dangerously-skip-permissions
+```
+
+This mounts:
+- Your current directory at the same path (so `/resume` works correctly)
+- Your `~/.claude` directory for session persistence
 
 ## Configuration
 
