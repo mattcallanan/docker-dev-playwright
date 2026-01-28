@@ -2,3 +2,4 @@
 .idea/vcs.xml
 node_modules
 start-playwright-server.log
+.idea
