@@ -1,8 +1,14 @@
 import { firefox } from '@playwright/test';
 
-// Launch browser directly in the container
-const browser = await firefox.launch({
-  headless: true
+const token = process.env.PLAYWRIGHT_TOKEN;
+if (!token) {
+  console.error('Error: PLAYWRIGHT_TOKEN environment variable is required');
+  process.exit(1);
+}
+
+// Connect to browser running on host machine
+const browser = await firefox.connect({
+  wsEndpoint: `ws://host.docker.internal:9323/${token}`
 });
 
 const context = await browser.newContext({
