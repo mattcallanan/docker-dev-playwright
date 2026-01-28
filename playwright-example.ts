@@ -19,5 +19,8 @@ const page = await context.newPage();
 await page.goto('https://example.com');
 console.log('Page title:', await page.title());
 
+console.log('Pausing for 30 seconds - inspect the browser now...');
+await page.waitForTimeout(30000);
+
 await browser.close();
 
