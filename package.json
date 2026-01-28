@@ -1,0 +1,10 @@
+{
+  "name": "docker-dev-playwright",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Playwright development container with top-level await support",
+  "dependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}
