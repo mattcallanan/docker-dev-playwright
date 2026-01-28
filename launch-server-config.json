@@ -1,0 +1,5 @@
+{
+  "headless": false,
+  "port": 9323,
+  "wsHost": "0.0.0.0"
+}

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.57.0-noble
+FROM mcr.microsoft.com/playwright:v1.58.0-noble
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -23,11 +23,17 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m dev && echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER dev
-WORKDIR /workspace
 
-# Copy package.json and install Node.js dependencies
+# Install Node.js dependencies in /app (won't be overwritten by volume mount)
+WORKDIR /app
 COPY --chown=dev:dev package.json ./
-RUN npm install
+RUN npm config set strict-ssl false && npm install
+
+# Set NODE_PATH so node can find modules from /app/node_modules
+ENV NODE_PATH=/app/node_modules
+
+# Set working directory to /workspace for user files
+WORKDIR /workspace
 
 # SDKMAN + Kotlin + Gradle
 ENV sdkman_insecure_ssl=true
@@ -50,4 +56,11 @@ RUN pipx install virtualenv
 # PATH setup
 ENV PATH="/home/dev/.local/bin:/home/dev/.sdkman/bin:$PATH"
 
+# Copy and setup entrypoint script
+COPY --chown=dev:dev docker-entrypoint.sh /usr/local/bin/
+USER root
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+USER dev
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD [ "bash" ]

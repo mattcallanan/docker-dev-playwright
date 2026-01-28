@@ -1,11 +1,17 @@
 import { firefox } from '@playwright/test';
 
-const browser = await firefox.connect({
-  wsEndpoint: 'ws://host.docker.internal:9323'
+// Launch browser directly in the container
+const browser = await firefox.launch({
+  headless: true
 });
 
-const context = await browser.newContext();
+const context = await browser.newContext({
+  ignoreHTTPSErrors: true
+});
 const page = await context.newPage();
 
 await page.goto('https://example.com');
+console.log('Page title:', await page.title());
+
+await browser.close();
 

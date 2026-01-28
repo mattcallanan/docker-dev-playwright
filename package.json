@@ -5,6 +5,7 @@
   "private": true,
   "description": "Playwright development container with top-level await support",
   "dependencies": {
-    "@playwright/test": "^1.57.0"
+    "@playwright/test": "^1.57.0",
+    "tsx": "^4.19.2"
   }
 }
