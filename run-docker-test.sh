@@ -16,5 +16,14 @@ echo "Playwright server started with token: $TOKEN"
 echo "Running test in Docker..."
 echo ""
 
+# Ensure ~/.claude exists on host for Claude Code CLI session persistence
+mkdir -p "$HOME/.claude"
+
 # Run the docker command with the token
-docker run --rm -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN="$TOKEN" docker-dev-playwright npx tsx playwright-example.ts
+# Mount ~/.claude for Claude Code CLI session persistence
+docker run --rm \
+  -v "$PWD:/workspace" \
+  -v "$HOME/.claude:/home/dev/.claude" \
+  --add-host=host.docker.internal:host-gateway \
+  -e PLAYWRIGHT_TOKEN="$TOKEN" \
+  docker-dev-playwright npx tsx playwright-example.ts

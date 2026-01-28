@@ -32,5 +32,14 @@ echo ""
 echo "Starting interactive Docker container..."
 echo ""
 
+# Ensure ~/.claude exists on host for Claude Code CLI session persistence
+mkdir -p "$HOME/.claude"
+
 # Run the docker command interactively with the token
-docker run --rm -it -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN="$TOKEN" docker-dev-playwright
+# Mount ~/.claude for Claude Code CLI session persistence
+docker run --rm -it \
+  -v "$PWD:/workspace" \
+  -v "$HOME/.claude:/home/dev/.claude" \
+  --add-host=host.docker.internal:host-gateway \
+  -e PLAYWRIGHT_TOKEN="$TOKEN" \
+  docker-dev-playwright

@@ -53,6 +53,11 @@ EOF
 RUN pipx install poetry
 RUN pipx install virtualenv
 
+# Install Claude Code CLI globally (needs root for /usr/lib/node_modules)
+USER root
+RUN npm config set strict-ssl false && npm install -g @anthropic-ai/claude-code
+USER dev
+
 # PATH setup
 ENV PATH="/home/dev/.local/bin:/home/dev/.sdkman/bin:$PATH"
 
