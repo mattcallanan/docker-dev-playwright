@@ -24,34 +24,22 @@ npm install
 npx playwright install firefox
 ```
 
-### Step 3: Start the Playwright Browser Server
+### Step 3: Run the Test
 
-On your local machine, start the Playwright server using the helper script:
+Run the test with a single command:
 
 ```bash
-./start-playwright-server.sh
+./run-docker-test.sh
 ```
 
-This will launch a visible Firefox browser and display the token:
-
-```
-Starting Playwright server (PID: 12345)...
-
-Listening on ws://127.0.0.1:9323/abc123xyz
-
-========================================
-PLAYWRIGHT_TOKEN=abc123xyz
-========================================
-
-Run in another terminal:
-docker run --rm -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN=abc123xyz docker-dev-playwright npx tsx playwright-example.ts
-```
-
-### Step 4: Run the Test from Docker
-
-In a new terminal, copy and run the docker command shown in Step 3.
+This will:
+1. Start the Playwright server (Firefox browser opens)
+2. Extract the connection token
+3. Run the test in Docker with the token
 
 Watch the Firefox browser on your Mac execute the test in real-time.
+
+Server logs are written to `start-playwright-server.log` with ISO 8601 timestamps.
 
 ## How It Works
 
@@ -78,13 +66,19 @@ Watch the Firefox browser on your Mac execute the test in real-time.
 
 ## Interactive Development
 
-Start an interactive shell inside the container (using the token from `./start-playwright-server.sh`):
+Start the Playwright server and capture the token:
 
 ```bash
-docker run -it --rm -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN=abc123xyz docker-dev-playwright bash
+TOKEN=$(./start-playwright-server.sh)
 ```
 
-Then run your test scripts as needed:
+Then start an interactive shell:
+
+```bash
+docker run -it --rm -v "$PWD:/workspace" --add-host=host.docker.internal:host-gateway -e PLAYWRIGHT_TOKEN="$TOKEN" docker-dev-playwright bash
+```
+
+Run your test scripts inside the container:
 
 ```bash
 npx tsx playwright-example.ts
@@ -114,7 +108,7 @@ Make sure the Playwright server is running on your Mac and `wsHost` is set to `"
 
 ### Token Mismatch
 
-Each time you restart the Playwright server, it generates a new token. Update the `PLAYWRIGHT_TOKEN` environment variable with the new token.
+Each time you restart the Playwright server, it generates a new token. The scripts handle this automatically, but if running manually, get a fresh token with `./start-playwright-server.sh`.
 
 ### DNS Issues
 
